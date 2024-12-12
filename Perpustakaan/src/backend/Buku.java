@@ -195,4 +195,18 @@ public class Buku {
         DBHelper.executeQuery(SQL);
     }
 
+    public Buku getById2(int id) {
+        Buku buk = new Buku();
+        ResultSet rs = DBHelper.selectQuery("SELECT * FROM buku WHERE idbuku = " + id);
+        try {
+            if (rs.next()) {
+                buk.setIdbuku(rs.getInt("idbuku"));
+                buk.setJudul(rs.getString("judul"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return buk;
+    }
+
 }
