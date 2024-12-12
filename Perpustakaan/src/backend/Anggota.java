@@ -136,5 +136,21 @@ public class Anggota {
         String SQL = "DELETE FROM anggota WHERE idanggota = '" + this.idanggota + "'";
         DBHelper.executeQuery(SQL);
     }
+
+    public Anggota getById2(int id) {
+        Anggota ang = new Anggota();
+        ResultSet rs = DBHelper.selectQuery("SELECT * FROM anggota WHERE idanggota = " + id);
+        try {
+            if (rs.next()) {
+                ang.setIdanggota(rs.getInt("idanggota"));
+                ang.setNama(rs.getString("nama"));
+                ang.setAlamat(rs.getString("alamat"));
+                ang.setTelepon(rs.getString("telepon"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ang;
+    }
     
 }
