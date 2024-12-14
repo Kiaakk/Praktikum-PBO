@@ -8,6 +8,7 @@ import backend.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -24,31 +25,34 @@ public class FrmPeminjaman extends javax.swing.JFrame {
         kosongkanForm();
         tampilkanData();
     }
-    
+
     public void kosongkanForm() {
         txtIdPeminjaman.setText("0");
         txtIdAnggota.setText("0");
         txtIdBuku.setText("0");
+        txtIdpegawai.setText("0");
         txtTanggalPinjam.setText("");
         txtTanggalKembali.setText("");
         lblAnggota.setText("Nama Anggota");
         lblBuku.setText("Judul Buku");
+        lblPegawai.setText("Nama Pegawai");
     }
-    
+
     public void tampilkanData() {
-        String[] kolom = {"ID", "Anggota", "Buku", "Tanggal Pinjam", "Tanggal Kembali"};
+        String[] kolom = {"ID", "Pegawai", "Anggota", "Buku", "Tanggal Pinjam", "Tanggal Kembali"};
         ArrayList<Peminjaman> list = new Peminjaman().getAll();
-        Object rowData[] = new Object[5];
-        
-        tblPeminjaman.setModel(new DefaultTableModel(new Object[][] {}, kolom));
-        
+        Object rowData[] = new Object[6];
+
+        tblPeminjaman.setModel(new DefaultTableModel(new Object[][]{}, kolom));
+
         for (int i = 0; i < list.size(); i++) {
             rowData[0] = list.get(i).getIdpeminjaman();
-            rowData[1] = list.get(i).getAnggota().getNama();
-            rowData[2] = list.get(i).getBuku().getJudul();
-            rowData[3] = list.get(i).getTanggalpinjam();
-            rowData[4] = list.get(i).getTanggalkembali();
-            ((DefaultTableModel)tblPeminjaman.getModel()).addRow(rowData);
+            rowData[1] = list.get(i).getPegawai().getNama();
+            rowData[2] = list.get(i).getAnggota().getNama();
+            rowData[3] = list.get(i).getBuku().getJudul();
+            rowData[4] = list.get(i).getTanggalpinjam();
+            rowData[5] = list.get(i).getTanggalkembali();
+            ((DefaultTableModel) tblPeminjaman.getModel()).addRow(rowData);
         }
     }
 
@@ -79,9 +83,13 @@ public class FrmPeminjaman extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         btnSimpan = new javax.swing.JButton();
         btnTambahBaru = new javax.swing.JButton();
-        btnHapus = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblPeminjaman = new javax.swing.JTable();
+        jLabel6 = new javax.swing.JLabel();
+        txtIdpegawai = new javax.swing.JTextField();
+        btnCariPegawai = new javax.swing.JButton();
+        lblPegawai = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -96,6 +104,14 @@ public class FrmPeminjaman extends javax.swing.JFrame {
         jLabel5.setText("Tanggal Kembali");
 
         txtIdPeminjaman.setEnabled(false);
+
+        txtTanggalPinjam.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtTanggalPinjamActionPerformed(evt);
+            }
+        });
+
+        txtTanggalKembali.setEnabled(false);
 
         btnCariAnggota.setText("Cari");
         btnCariAnggota.addActionListener(new java.awt.event.ActionListener() {
@@ -133,13 +149,6 @@ public class FrmPeminjaman extends javax.swing.JFrame {
             }
         });
 
-        btnHapus.setText("Hapus");
-        btnHapus.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnHapusActionPerformed(evt);
-            }
-        });
-
         tblPeminjaman.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -151,7 +160,36 @@ public class FrmPeminjaman extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblPeminjaman.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblPeminjamanMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblPeminjaman);
+
+        jLabel6.setText("ID Pegawai");
+
+        txtIdpegawai.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtIdpegawaiActionPerformed(evt);
+            }
+        });
+
+        btnCariPegawai.setText("Cari");
+        btnCariPegawai.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCariPegawaiActionPerformed(evt);
+            }
+        });
+
+        lblPegawai.setText("Nama Pegawai");
+
+        jButton1.setText("Update");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -160,22 +198,28 @@ public class FrmPeminjaman extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnTambahBaru)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnTambahBaru)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnHapus))
-                    .addComponent(btnSimpan)
+                        .addComponent(btnSimpan)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton1))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 528, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
                             .addComponent(jLabel2)
                             .addComponent(jLabel3)
                             .addComponent(jLabel4)
-                            .addComponent(jLabel5))
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel6))
                         .addGap(44, 44, 44)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(txtTanggalPinjam, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
+                                .addComponent(txtIdpegawai, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnCariPegawai, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))
+                            .addComponent(txtTanggalPinjam)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(txtIdPeminjaman)
                                     .addComponent(txtIdAnggota)
@@ -184,14 +228,14 @@ public class FrmPeminjaman extends javax.swing.JFrame {
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(btnCariJudul, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(btnCariAnggota, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)))
-                            .addComponent(txtTanggalKembali))
+                            .addComponent(txtTanggalKembali, javax.swing.GroupLayout.Alignment.TRAILING))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblAnggota)
                             .addComponent(lblBuku)
                             .addComponent(jLabel8)
-                            .addComponent(jLabel9)))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 528, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel9)
+                            .addComponent(lblPegawai))))
                 .addContainerGap(24, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -202,6 +246,12 @@ public class FrmPeminjaman extends javax.swing.JFrame {
                     .addComponent(jLabel1)
                     .addComponent(txtIdPeminjaman, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(txtIdpegawai, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCariPegawai)
+                    .addComponent(lblPegawai))
+                .addGap(16, 16, 16)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(txtIdAnggota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -224,53 +274,54 @@ public class FrmPeminjaman extends javax.swing.JFrame {
                     .addComponent(txtTanggalKembali, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel9))
                 .addGap(29, 29, 29)
-                .addComponent(btnSimpan)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnTambahBaru)
-                    .addComponent(btnHapus))
+                    .addComponent(btnSimpan)
+                    .addComponent(jButton1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnTambahBaru)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addContainerGap(116, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
-        // TODO add your handling code here:
+        // Membuat objek peminjaman baru
         Peminjaman peminjaman = new Peminjaman();
-        peminjaman.setIdpeminjaman(Integer.parseInt(txtIdPeminjaman.getText()));
-        // Ambil ID Anggota dan ID Buku dari inputan TextField
+        peminjaman.setIdpeminjaman(Integer.parseInt(txtIdPeminjaman.getText())); // Set ID peminjaman
+
+        // Ambil ID Anggota, ID Buku, dan ID Pegawai dari input
         int idAnggota = Integer.parseInt(txtIdAnggota.getText());
         int idBuku = Integer.parseInt(txtIdBuku.getText());
+        int idPegawai = Integer.parseInt(txtIdpegawai.getText());
 
-        // Mendapatkan objek Anggota dan Buku berdasarkan ID yang sudah ada
-        Anggota anggota = new Anggota();
-        anggota.setIdanggota(idAnggota); // Menetapkan ID Anggota
+        peminjaman.getAnggota().setIdanggota(idAnggota);
+        peminjaman.getBuku().setIdbuku(idBuku);
+        peminjaman.getPegawai().setIdpegawai(idPegawai);
 
-        Buku buku = new Buku();
-        buku.setIdbuku(idBuku); // Menetapkan ID Buku
+        // Ambil tanggal pinjam dan set ke objek peminjaman
+        String tanggalPinjamText = txtTanggalPinjam.getText();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate tanggalPinjam = LocalDate.parse(tanggalPinjamText, formatter);
+        peminjaman.setTanggalpinjam(tanggalPinjam);
 
-        // Set objek Anggota dan Buku ke dalam peminjaman
-        peminjaman.setAnggota(anggota);
-        peminjaman.setBuku(buku);
-        
-        // Ambil tanggal pinjam dari JTextField dan konversi ke LocalDate
-        String tanggalPinjamText = txtTanggalPinjam.getText();  // Ambil input tanggal pinjam
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // Format yang digunakan
-        LocalDate tanggalPinjam = LocalDate.parse(tanggalPinjamText, formatter); // Konversi String ke LocalDate
-        peminjaman.setTanggalpinjam(tanggalPinjam); // Set tanggal pinjam ke objek peminjaman
+        // Ambil tanggal kembali dari input (boleh kosong)
+        String tanggalKembaliText = txtTanggalKembali.getText().isEmpty() ? null : txtTanggalKembali.getText();
+        LocalDate tanggalKembali = null;
+        if (tanggalKembaliText != null) {
+            tanggalKembali = LocalDate.parse(tanggalKembaliText, formatter);
+        }
+        peminjaman.setTanggalkembali(tanggalKembali);
 
-        // Ambil tanggal kembali dan konversi ke LocalDate
-        String tanggalKembaliText = txtTanggalKembali.getText();  // Ambil input tanggal kembali
-        LocalDate tanggalKembali = LocalDate.parse(tanggalKembaliText, formatter); // Konversi String ke LocalDate
-        peminjaman.setTanggalkembali(tanggalKembali); // Set tanggal kembali ke objek peminjaman
-        
+        // Simpan peminjaman ke database
         peminjaman.save();
-        
+
+        // Update ID Peminjaman pada form setelah disimpan
         txtIdPeminjaman.setText(Integer.toString(peminjaman.getIdpeminjaman()));
-        
+
+        // Tampilkan data terbaru dalam tabel
         tampilkanData();
     }//GEN-LAST:event_btnSimpanActionPerformed
 
@@ -301,7 +352,7 @@ public class FrmPeminjaman extends javax.swing.JFrame {
 
             Buku buku = new Buku().getById2(idBuku);  // Cari Buku berdasarkan ID
 
-            if (buku.getIdbuku()!= 0) {  // Jika ID Buku ditemukan
+            if (buku.getIdbuku() != 0) {  // Jika ID Buku ditemukan
                 lblBuku.setText(buku.getJudul());  // Tampilkan Judul Buku
             } else {
                 lblBuku.setText("Buku tidak ditemukan");
@@ -312,21 +363,110 @@ public class FrmPeminjaman extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnCariJudulActionPerformed
 
-    private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusActionPerformed
-        // TODO add your handling code here:
-        DefaultTableModel model = (DefaultTableModel)tblPeminjaman.getModel();
-        int row = tblPeminjaman.getSelectedRow();
-        
-        Peminjaman peminjaman = new Peminjaman().getById(Integer.parseInt(model.getValueAt(row, 0).toString()));
-        peminjaman.delete();
-        kosongkanForm();
-        tampilkanData();
-    }//GEN-LAST:event_btnHapusActionPerformed
-
     private void btnTambahBaruActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahBaruActionPerformed
         // TODO add your handling code here:
         kosongkanForm();
     }//GEN-LAST:event_btnTambahBaruActionPerformed
+
+    private void txtIdpegawaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdpegawaiActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtIdpegawaiActionPerformed
+
+    private void btnCariPegawaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCariPegawaiActionPerformed
+        // TODO add your handling code here:
+        String idPegawaiTest = txtIdpegawai.getText();
+        try {
+            int idPegawai = Integer.parseInt(idPegawaiTest);  // Convert ID ke integer
+
+            Pegawai pegawai = new Pegawai().getById2(idPegawai);  // Cari Buku berdasarkan ID
+
+            if (pegawai.getIdpegawai() != 0) {  // Jika ID Buku ditemukan
+                lblPegawai.setText(pegawai.getNama());  // Tampilkan Nama Pegawai
+            } else {
+                lblPegawai.setText("Pegawai tidak ditemukan");
+            }
+
+        } catch (NumberFormatException ex) {
+            lblPegawai.setText("ID tidak valid");
+        }
+    }//GEN-LAST:event_btnCariPegawaiActionPerformed
+
+    private void txtTanggalPinjamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTanggalPinjamActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtTanggalPinjamActionPerformed
+
+    private void tblPeminjamanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblPeminjamanMouseClicked
+        // Mendapatkan indeks baris yang diklik
+        int row = tblPeminjaman.getSelectedRow();
+
+        // Validasi jika ada baris yang dipilih
+        if (row >= 0) {
+            // Mengambil nilai dari tabel berdasarkan indeks baris
+            String idPeminjaman = tblPeminjaman.getValueAt(row, 0).toString();
+            String idPegawai = tblPeminjaman.getValueAt(row, 1).toString();
+            String idAnggota = tblPeminjaman.getValueAt(row, 2).toString();
+            String idBuku = tblPeminjaman.getValueAt(row, 3).toString();
+            String tanggalPinjam = tblPeminjaman.getValueAt(row, 4).toString();
+            String tanggalKembali = tblPeminjaman.getValueAt(row, 5).toString();
+
+            // Mengisi nilai ke form
+            txtIdPeminjaman.setText(idPeminjaman);
+            txtIdpegawai.setText(idPegawai);
+            txtIdAnggota.setText(idAnggota);
+            txtIdBuku.setText(idBuku);
+            txtTanggalPinjam.setText(tanggalPinjam);
+            txtTanggalKembali.setText(tanggalKembali);
+
+            // Form 'Tanggal Kembali' diaktifkan, form lain dinonaktifkan
+            txtTanggalKembali.setEnabled(true);
+            txtIdPeminjaman.setEnabled(false);
+            txtIdpegawai.setEnabled(false);
+            txtIdAnggota.setEnabled(false);
+            txtIdBuku.setEnabled(false);
+            txtTanggalPinjam.setEnabled(false);
+
+            // Menampilkan pesan informasi
+            JOptionPane.showMessageDialog(this, "Form dalam mode update. Ubah tanggal kembali jika diperlukan.");
+        }
+    }//GEN-LAST:event_tblPeminjamanMouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // Ambil ID Peminjaman dari form
+        int idPeminjaman = Integer.parseInt(txtIdPeminjaman.getText());
+
+        // Membuat objek peminjaman dan mengambil data terkait berdasarkan ID
+        Peminjaman peminjaman = new Peminjaman().getById(idPeminjaman);
+
+        // Ambil tanggal pinjam dari form dan konversi ke LocalDate
+        String tanggalPinjamText = txtTanggalPinjam.getText();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate tanggalPinjam = LocalDate.parse(tanggalPinjamText, formatter);
+        peminjaman.setTanggalpinjam(tanggalPinjam);
+
+        // Ambil tanggal kembali dari form, jika tidak kosong, konversi ke LocalDate
+        String tanggalKembaliText = txtTanggalKembali.getText();
+        LocalDate tanggalKembali = null;
+
+        // Jika tanggal kembali tidak kosong, konversikan menjadi LocalDate
+        if (!tanggalKembaliText.isEmpty()) {
+            tanggalKembali = LocalDate.parse(tanggalKembaliText, formatter);
+        }
+
+        // Set tanggal kembali, jika tidak kosong
+        peminjaman.setTanggalkembali(tanggalKembali);
+
+        // Update data peminjaman
+        peminjaman.update();
+
+        // Tampilkan pesan sukses
+        JOptionPane.showMessageDialog(this, "Data peminjaman berhasil diperbarui!");
+
+        // Tampilkan data terbaru dalam tabel
+        tampilkanData();
+
+        // Kosongkan form
+        kosongkanForm();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -366,23 +506,27 @@ public class FrmPeminjaman extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCariAnggota;
     private javax.swing.JButton btnCariJudul;
-    private javax.swing.JButton btnHapus;
+    private javax.swing.JButton btnCariPegawai;
     private javax.swing.JButton btnSimpan;
     private javax.swing.JButton btnTambahBaru;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblAnggota;
     private javax.swing.JLabel lblBuku;
+    private javax.swing.JLabel lblPegawai;
     private javax.swing.JTable tblPeminjaman;
     private javax.swing.JTextField txtIdAnggota;
     private javax.swing.JTextField txtIdBuku;
     private javax.swing.JTextField txtIdPeminjaman;
+    private javax.swing.JTextField txtIdpegawai;
     private javax.swing.JFormattedTextField txtTanggalKembali;
     private javax.swing.JFormattedTextField txtTanggalPinjam;
     // End of variables declaration//GEN-END:variables
